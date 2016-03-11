@@ -1,2 +1,2 @@
 # cdk-install
-Install RedHat Container Development Kit using ansible playbook
+Install Red Hat Container Development Kit using ansible playbook
