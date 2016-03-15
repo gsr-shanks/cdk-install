@@ -1,6 +1,8 @@
 # cdk-install
 Install Red Hat Container Development Kit using ansible playbook
 
+Pre-requisite: ansible >= 2.0
+
 Things to do before you run this playbook:
 
 1. Update cdk-install/ansible/ansible_inventory.txt and list your hostname to install CDK under [RedHat] group.
