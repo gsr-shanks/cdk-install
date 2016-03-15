@@ -1,0 +1,16 @@
+---
+
+- name: load wget script
+  template: src=files/wget_latest_cdk_build.sh.j2 dest=~/wget_latest_cdk.sh mode=777
+
+- name: wget script
+  command: sh ~/wget_latest_cdk.sh
+
+- name: install vagrant-service-manager plugin
+  shell: . /opt/rh/sclo-vagrant1/enable;
+    vagrant plugin install vagrant-service-manager
+    chdir=~/cdk/plugins
+
+- name: vagrant add libvirt box
+  shell: . /opt/rh/sclo-vagrant1/enable;
+    vagrant box add --name cdkv2 *libvirt.box

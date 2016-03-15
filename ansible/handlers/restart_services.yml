@@ -1,0 +1,7 @@
+---
+
+- name: restart libvirtd
+  action: service name=libvirtd state=restarted enabled=yes
+
+- name: restart polkit
+  action: service name=polkit state=restarted enabled=yes

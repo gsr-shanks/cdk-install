@@ -1,0 +1,15 @@
+---
+
+- name: rhn_register workstation
+  redhat_subscription: state=present
+                       autosubscribe={{ autosubscribe }}
+                       org_id={{ rhn_org }}
+                       activationkey={{ rhn_activationkey }}
+                       server_hostname={{ rhn_server_hostname }}
+                       server_insecure={{ rhn_server_insecure }}
+  when: rhn_method == "rhsm"
+
+- name: rhn_register enable repos
+  shell: subscription-manager repos --enable {{ item }}
+  with_items: "{{ rhsm_repos }}"
+  when: rhn_method == "rhsm" and rhsm_repos > 0
