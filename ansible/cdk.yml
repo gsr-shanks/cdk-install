@@ -1,0 +1,23 @@
+---
+
+# CDK install
+- hosts: RedHat
+  remote_user: root
+  tasks:
+    - include: tasks/rhn_register.yml
+      when: rhn_method is defined
+    - include: tasks/yum.yml
+      when: ansible_os_family == 'RedHat' and ansible_distribution_version == '7.2'
+
+    - include: tasks/prereq.yml
+
+    - include: tasks/cdk.yml
+      become: yes
+      become_user: cdk
+
+    - include: tasks/vagrant.yml
+      become: yes
+      become_user: cdk
+      environment:
+        SUB_USERNAME: "{{ rhn_username }}"
+        SUB_PASSWORD: "{{ rhn_password }}"

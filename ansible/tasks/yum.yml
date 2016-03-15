@@ -1,0 +1,27 @@
+---
+
+- name: yum_repos | enable requested repos
+  shell: yum-config-manager --enable --add-repo={{ item }} 1>/dev/null
+  with_items: "{{ enabled_repos }}"
+  when: enabled_repos is defined and enabled_repos|length > 0
+
+- name: yum_repos | disable requested repos
+  shell: yum-config-manager --disable $item 1>/dev/null
+  with_items: "{{ disabled_repos }}"
+  when: disabled_repos is defined and enabled_repos|length > 0
+
+- name: yum_repos | skip requested repos
+  shell: yum-config-manager --save --setopt={{ item }}.skip_if_unavailable=true
+  with_items: "{{ skipped_repos }}"
+  when: skipped_repos is defined and enabled_repos|length > 0
+
+- name: yum_install | install rpms
+  yum: name={{ item }} state=latest disable_gpg_check=yes
+  with_items: "{{ yum_pkgs }}"
+  when: yum_pkgs is defined and yum_pkgs|length > 0
+
+- name: upgrade all packages to latest
+  yum: name=* state=latest disable_gpg_check=yes
+
+- name: install virtualization group
+  yum: name="@^virtualization-host-environment" state=present disable_gpg_check=yes

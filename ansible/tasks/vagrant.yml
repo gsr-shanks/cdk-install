@@ -1,0 +1,13 @@
+---
+
+- name: load ose vagrant script
+  template: src=files/vagrant-up-ose.sh.j2 dest=~/vagrant-up-ose.sh mode=777
+
+- name: load k8s vagrant script
+  template: src=files/vagrant-up-k8s.sh.j2 dest=~/vagrant-up-k8s.sh mode=777
+
+- name: vagrant up rhel-ose with subscription manager
+  command: sh ~/vagrant-up-ose.sh
+
+- name: vagrant up rhel-k8s with subscription manager
+  command: sh ~/vagrant-up-k8s.sh
