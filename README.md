@@ -13,4 +13,5 @@ Things to do before you run this playbook:
     * rhn_org
     * rhn_activationkey
     * cdk_location
-3. Change directory to cdk-install/scripts and execute "./install-cdk.sh"
+3. Set 'rhn_server_hostname' in cdk-install/group_vars/RedHat as appropriate.
+4. Change directory to cdk-install/scripts and execute "./install-cdk.sh"
