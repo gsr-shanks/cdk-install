@@ -10,6 +10,9 @@
   with_items: "{{ disabled_repos }}"
   when: disabled_repos is defined and enabled_repos|length > 0
 
+- name: install yum-utils
+  yum: name="yum-utils" state=latest
+
 - name: yum_repos | skip requested repos
   shell: yum-config-manager --save --setopt={{ item }}.skip_if_unavailable=true
   with_items: "{{ skipped_repos }}"
