@@ -1,17 +1,18 @@
 ---
 
-#
-# RHSM configuration
-#
+# ~~~ CDK http downloadable location which contains: boxes, zip and ks
+cdk_location:
+
+# ~~~ RHSM configuration
 rhn_method: rhsm
 rhn_username:
 rhn_password:
 rhn_org: ''
 rhn_activationkey:
 
-#rhn_server_hostname: subscription.rhn.redhat.com
 rhn_server_hostname: subscription.rhn.stage.redhat.com
 #rhn_server_hostname: subscription.rhn.qa.redhat.com
+#rhn_server_hostname: subscription.rhn.redhat.com
 
 rhn_server_insecure: false
 autosubscribe: true
@@ -30,16 +31,9 @@ yum_pkgs:
     - ruby-devel
     - rh-ruby22-ruby-devel
 
-#
-# YUM repo configuration
-#
+# ~~~ YUM repo configuration
 enabled_repos:
     - http://mirror.centos.org/centos-7/7/sclo/x86_64/sclo/
 disabled_repos: []
 skipped_repos:
     - rhel-7-server-rt-beta-rpms
-
-#
-# CDK downloadable location
-#
-cdk_location:

@@ -1,10 +1,11 @@
 # cdk-install
 Install Red Hat Container Development Kit using ansible playbook
 
-Pre-requisite: ansible >= 2.0
+Pre-requisite: ansible >= 2.0 ( Available at ftp://195.220.108.108/linux/epel/testing/7/x86_64/a/ansible-2.0.1.0-2.el7.noarch.rpm or pip )
 
 Things to do before you run this playbook:
 
+0. Ensure that you have ssh key based authentication setup to the host.
 1. Update cdk-install/ansible_inventory.txt and list your hostname to install CDK under [RedHat] group.
 2. Update cdk-install/group_vars/RedHat and provide 
     * rhn_method
