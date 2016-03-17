@@ -6,13 +6,13 @@ Pre-requisite: ansible >= 2.0 ( Available at ftp://195.220.108.108/linux/epel/te
 Things to do before you run this playbook:
 
 0. Ensure that you have ssh key based authentication setup to the host.
-1. Update cdk-install/ansible_inventory.txt and list your hostname to install CDK under [RedHat] group.
-2. Update cdk-install/group_vars/RedHat and provide 
+1. Update cdk-install/ansible_inventory.txt and list your hostname to install CDK under [cdk] group.
+2. If your host is RedHat, then update cdk-install/group_vars/all and provide 
     * rhn_method
     * rhn_username
     * rhn_password
     * rhn_org
     * rhn_activationkey
     * cdk_location
-3. Set 'rhn_server_hostname' in cdk-install/group_vars/RedHat as appropriate.
+3. If required, set 'rhn_server_hostname' in cdk-install/group_vars/all as appropriate.
 4. Change directory to cdk-install/scripts and execute "./install-cdk.sh"

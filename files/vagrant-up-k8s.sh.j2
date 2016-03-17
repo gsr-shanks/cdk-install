@@ -3,4 +3,9 @@
 cd /home/cdk/cdk/components/rhel/misc/rhel-k8s-singlenode-setup
 sed -i '$i  config.registration.serverurl = "{{ rhn_server_hostname }}"' Vagrantfile
 sed -i '$i  config.registration.baseurl = "{{ rhsm_baseurl }}"' Vagrantfile
-scl enable sclo-vagrant1 'bash -c "vagrant up"'
+
+if grep -i fedora /etc/redhat-release; then
+    vagrant up
+else
+    scl enable sclo-vagrant1 'bash -c "vagrant up"'
+fi

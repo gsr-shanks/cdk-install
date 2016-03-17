@@ -20,8 +20,8 @@
 
 - name: yum_install | install rpms
   yum: name={{ item }} state=latest disable_gpg_check=yes
-  with_items: "{{ yum_pkgs }}"
-  when: yum_pkgs is defined and yum_pkgs|length > 0
+  with_items: "{{ rhel_pkgs }}"
+  when: rhel_pkgs is defined and rhel_pkgs|length > 0
 
 - name: upgrade all packages to latest
   yum: name=* state=latest disable_gpg_check=yes

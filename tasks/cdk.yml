@@ -6,11 +6,27 @@
 - name: wget script
   command: sh ~/wget_latest_cdk.sh
 
-- name: install vagrant-service-manager plugin
+- name: rhel - install vagrant-service-manager plugin
   shell: . /opt/rh/sclo-vagrant1/enable;
     vagrant plugin install vagrant-service-manager
     chdir=~/cdk/plugins
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
 
-- name: vagrant add libvirt box
+- name: rhel - vagrant add libvirt box
   shell: . /opt/rh/sclo-vagrant1/enable;
     vagrant box add --name cdkv2 *libvirt.box
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+- name: fedora - install vagrant-service-manager plugin
+  shell: vagrant plugin install vagrant-service-manager
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version >= '23'
+
+- name: fedora - install fog-libvirt plugin
+  shell: vagrant plugin install --plugin-version 0.0.3 fog-libvirt
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version == '23'
+
+- name: fedora - vagrant add libvirt box
+  shell: vagrant box add --name cdkv2 *libvirt.box
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version == '23'

@@ -8,6 +8,15 @@
 - name: copy vagrant-libvirt-rules
   shell: cp /opt/rh/sclo-vagrant1/root/usr/share/vagrant/gems/doc/vagrant-libvirt-*/polkit/10-vagrant-libvirt.rules
     /etc/polkit-1/rules.d
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version == '7.2'
+  notify:
+    - restart libvirtd
+    - restart polkit
+
+- name: copy vagrant-libvirt-rules
+  shell: cp /usr/share/vagrant/gems/doc/vagrant-libvirt-*/polkit/10-vagrant-libvirt.rules
+    /etc/polkit-1/rules.d
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version == '23'
   notify:
     - restart libvirtd
     - restart polkit

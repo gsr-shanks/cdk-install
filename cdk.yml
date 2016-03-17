@@ -1,13 +1,16 @@
 ---
 
 # CDK install
-- hosts: RedHat
+- hosts: cdk
   remote_user: root
   tasks:
     - include: tasks/rhn_register.yml
-      when: rhn_method is defined
+      when: ansible_os_family == 'RedHat' and ansible_distribution_version >= '7.2' and rhn_method is defined
     - include: tasks/yum.yml
-      when: ansible_os_family == 'RedHat' and ansible_distribution_version == '7.2'
+      when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+    - include: tasks/dnf.yml
+      when: ansible_distribution == 'Fedora' and ansible_distribution_version >= '23'
 
     - include: tasks/prereq.yml
 

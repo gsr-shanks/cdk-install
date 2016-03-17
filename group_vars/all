@@ -22,7 +22,7 @@ rhsm_repos:
     - rhel-7-server-optional-rpms
     - rhel-server-rhscl-7-rpms
 
-yum_pkgs:
+rhel_pkgs:
     - libvirt
     - sclo-vagrant1
     - sclo-vagrant1-vagrant-libvirt
@@ -30,6 +30,21 @@ yum_pkgs:
     - sclo-vagrant1-vagrant-registration
     - ruby-devel
     - rh-ruby22-ruby-devel
+
+fed_pkgs:
+    - vagrant
+    - vagrant-libvirt
+    - vagrant-libvirt-doc
+    - vagrant-registration
+    - rubygem-ruby-libvirt
+    - ruby-devel
+    - libvirt
+    - libvirt-devel
+    - libselinux-python
+    - yum-utils
+    - rubygem-ruby-libvirt
+    - redhat-rpm-config
+    - ftp://rpmfind.net/linux/fedora-secondary/development/rawhide/s390x/os/Packages/r/rubygem-fog-libvirt-0.0.3-2.fc24.noarch.rpm
 
 # ~~~ YUM repo configuration
 enabled_repos:
