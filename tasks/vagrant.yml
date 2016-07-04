@@ -1,13 +1,126 @@
 ---
 
+#- name: load wget script
+#  template: src=files/wget_latest_cdk_build.sh.j2 dest=~/wget_latest_cdk.sh mode=777
+#  tags: always
+
+#- name: execute wget script
+#  command: sh ~/wget_latest_cdk.sh
+#  tags: always
+
+- name: rhel - install vagrant-service-manager plugin
+  shell: . /opt/rh/sclo-vagrant1/enable;
+    vagrant plugin install vagrant-service-manager
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+  become: yes
+  become_user: root
+  tags: setup, rhel
+
+- name: rhel - vagrant add libvirt box
+  shell: . /opt/rh/sclo-vagrant1/enable;
+    vagrant box add --name cdkv2 *libvirt.box
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+  tags: setup, rhel
+
+- name: fedora - install vagrant-service-manager plugin
+  shell: vagrant plugin install vagrant-service-manager
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version >= '23'
+  tags: setup, fedora
+
+- name: fedora - install fog-libvirt plugin
+  shell: vagrant plugin install --plugin-version 0.0.3 fog-libvirt
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version == '23'
+  become: yes
+  become_user: root
+  tags: setup, fedora
+
+- name: fedora - vagrant add libvirt box
+  shell: vagrant box add --name cdkv2 *libvirt.box
+  when: ansible_distribution == 'Fedora' and ansible_distribution_version == '23'
+  tags: setup, fedora
+
+- name: osx - install vagrant-registration plugin
+  shell: vagrant plugin install ./vagrant-registration-*.gem
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - install vagrant-service-manager plugin
+  shell: vagrant plugin install ./vagrant-service-manager-*.gem
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - install vagrant-registration plugin
+  shell: vagrant plugin install ./vagrant-sshfs-*.gem
+    chdir=~/cdk/plugins
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - vagrant add virtualbox
+  shell: vagrant box add --name cdkv2 *virtualbox.box
+  when: ansible_distribution == 'MacOSX'
+  become: yes
+  become_user: "{{ username }}"
+  tags: setup, osx
+
 - name: load ose vagrant script
-  template: src=files/vagrant-up-ose.sh.j2 dest=~/vagrant-up-ose.sh mode=777
+  template: src=files/vagrant-up-ose.sh.j2 dest=/tmp/vagrant-up-ose.sh mode=777
+  when: registration_skip == 'false'
+  tags: setup, rhel, fedora, osx
 
 - name: load k8s vagrant script
-  template: src=files/vagrant-up-k8s.sh.j2 dest=~/vagrant-up-k8s.sh mode=777
+  template: src=files/vagrant-up-k8s.sh.j2 dest=/tmp/vagrant-up-k8s.sh mode=777
+  when: registration_skip == 'false'
+  tags: setup, rhel, fedora, osx
 
 - name: vagrant up rhel-ose with subscription manager
-  command: sh ~/vagrant-up-ose.sh
+  shell: . /tmp/vagrant-up-ose.sh
+  when: registration_skip == 'false'
+  tags: setup, rhel, fedora, osx
 
 - name: vagrant up rhel-k8s with subscription manager
-  command: sh ~/vagrant-up-k8s.sh
+  shell: . /tmp/vagrant-up-k8s.sh
+  when: registration_skip == 'false'
+  tags: setup, rhel, fedora, osx
+
+- name: load ose registration skip script
+  template: src=files/registration-skip-ose.sh.j2 dest=/tmp/registration-skip-ose.sh mode=777
+  when: registration_skip == 'true'
+  tags: setup, rhel, fedora, osx
+
+- name: load k8s registration skip script
+  template: src=files/registration-skip-k8s.sh.j2 dest=/tmp/registration-skip-k8s.sh mode=777
+  when: registration_skip == 'true'
+  tags: setup, rhel, fedora, osx
+
+- name: vagrant up rhel-ose with subscription manager skipped
+  shell: . /tmp/registration-skip-ose.sh
+  when: registration_skip == 'true'
+  tags: setup, rhel, fedora, osx
+
+- name: vagrant up rhel-k8s with subscription manager skipped
+  shell: . /tmp/registration-skip-k8s.sh
+  when: registration_skip == 'true'
+  tags: setup, rhel, fedora, osx
+
+- name: osx - vagrant up rhel-ose
+  environment:
+    SUB_USERNAME: "{{ rhn_username }}"
+    SUB_PASSWORD: "{{ rhn_password }}"
+  shell: vagrant up
+    chdir=~/cdk/components/rhel/rhel-ose
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - vagrant up rhel-k8s
+  environment:
+    SUB_USERNAME: "{{ rhn_username }}"
+    SUB_PASSWORD: "{{ rhn_password }}"
+  shell: vagrant up
+    chdir=~/cdk/components/rhel/misc/rhel-k8s-singlenode-setup
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx

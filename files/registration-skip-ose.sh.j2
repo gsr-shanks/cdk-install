@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+OS=`uname`
+pushd ~/cdk/components/rhel/rhel-ose
+
+case "$OS" in
+    Linux)
+        sed -i '$i  config.registration.skip = true' Vagrantfile
+        ;;
+    Darwin)
+        gsed -i '$i  config.registration.skip = true' Vagrantfile
+        ;;
+esac
+
+if [ -f /etc/redhat-release ]; then
+    if grep -i fedora /etc/redhat-release; then
+        vagrant up
+    elif grep -i 'red hat' /etc/redhat-release; then
+        scl enable sclo-vagrant1 'bash -c "vagrant up"'
+    fi
+fi
+
+popd
