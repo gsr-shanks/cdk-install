@@ -2,3 +2,4 @@
 localhost   ansible_connection=local
 
 [cdk]
+localhost   ansible_connection=local

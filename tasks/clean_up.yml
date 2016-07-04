@@ -1,0 +1,85 @@
+- name: destroy rhel-ose
+  shell: . /opt/rh/sclo-vagrant1/enable \
+      vagrant destroy -f
+    chdir=~/cdk/components/rhel/rhel-ose
+  become: yes
+  become_user: "{{ username }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+- name: destroy rhel-k8s
+  shell: . /opt/rh/sclo-vagrant1/enable \
+      vagrant destroy -f
+    chdir=~/cdk/components/rhel/misc/rhel-k8s-singlenode-setup
+  become: yes
+  become_user: "{{ username }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+- name: vagrant remove box
+  shell: . /opt/rh/sclo-vagrant1/enable \
+      vagrant box remove "{{ box_name }}"
+  become: yes
+  become_user: "{{ username }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+- name: uninstall vagrant plugins
+  shell: . /opt/rh/sclo-vagrant1/enable \
+      vagrant plugin uninstall vagrant-registration vagrant-service-manager vagrant-sshfs
+  become: yes
+  become_user: "{{ username }}"
+  when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+
+- name: destroy rhel-ose
+  shell: vagrant destroy -f
+    chdir=~/cdk/components/rhel/rhel-ose
+  become: yes
+  become_user: "{{ username }}"
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'MacOSX')
+
+- name: destroy rhel-k8s
+  shell: vagrant destroy -f
+    chdir=~/cdk/components/rhel/misc/rhel-k8s-singlenode-setup
+  become: yes
+  become_user: "{{ username }}"
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'MacOSX')
+
+- name: vagrant remove box
+  shell: vagrant box remove "{{ box_name }}"
+  become: yes
+  become_user: "{{ username }}"
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'MacOSX')
+
+- name: uninstall vagrant plugins
+  shell: vagrant plugin uninstall vagrant-registration vagrant-service-manager vagrant-sshfs
+  become: yes
+  become_user: "{{ username }}"
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'MacOSX')
+
+- name: userdel "{{ username }}"
+  user: name="{{ username }}" state=absent remove=yes force=yes
+  become: yes
+  become_user: root
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2')
+
+- name: yum_remove | installed rpms
+  yum: name={{ item }} state=removed disable_gpg_check=yes
+  with_items: "{{ rhel_pkgs }}"
+  when: rhel_pkgs is defined and rhel_pkgs|length > 0 and
+        (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2')
+
+- name: osx - remove {{ username }} user
+  shell: /usr/bin/dscl . -delete "/Users/{{ username }}"
+  when: ansible_distribution == 'MacOSX'
+  become: yes
+  become_user: root
+
+- name: osx - remove {{ username }} user directory
+  file: path=/Users/"{{ username }}" state=absent
+  when: ansible_distribution == 'MacOSX'
+  become: yes
+  become_user: root

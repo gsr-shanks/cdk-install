@@ -1,9 +1,20 @@
 ---
 
 - include: ../handlers/restart_services.yml
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2')
+  tags: setup, rhel, fedora
 
 - name: check cpuinfo for vmx or svm
   command: grep -iE 'vmx|svm' /proc/cpuinfo
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2')
+  tags: setup, rhel, fedora
+
+- name: check cpuinfo for vmx on osx
+  shell: sysctl -a | grep machdep.cpu.features | grep VMX
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
 
 - name: copy vagrant-libvirt-rules
   shell: cp /opt/rh/sclo-vagrant1/root/usr/share/vagrant/gems/doc/vagrant-libvirt-*/polkit/10-vagrant-libvirt.rules
@@ -12,6 +23,7 @@
   notify:
     - restart libvirtd
     - restart polkit
+  tags: setup, rhel
 
 - name: copy vagrant-libvirt-rules
   shell: cp /usr/share/vagrant/gems/doc/vagrant-libvirt-*/polkit/10-vagrant-libvirt.rules
@@ -20,6 +32,59 @@
   notify:
     - restart libvirtd
     - restart polkit
+  tags: setup, fedora
 
 - name: create cdk user and add it to vagrant group
-  user: name=cdk shell=/bin/bash groups=vagrant append=yes
+  user: name={{ username }} shell=/bin/bash groups=vagrant append=yes
+  when: (ansible_distribution == 'Fedora' and ansible_distribution_version == '23') or
+        (ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2')
+  tags: setup, rhel, fedora
+
+- name: osx - check if user exists
+  stat: path=/Users/{{ username }}
+  register: check_user
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - get next available User ID
+  shell: "echo $(dscl . -list /Users uid | awk '{print $2}' | sort -ug  | tail -1) + 1 | bc"
+  register: uid
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - make temp for user scripts
+  command: mktemp /tmp/create_{{ username }}-XXXXX
+  register: newuser_script
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - create user script
+  template: src=files/osx-newuser.sh.j2 dest={{ newuser_script.stdout }} mode=0755
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+- name: osx - create user!
+  shell: "{{ newuser_script.stdout }} creates=/Users/{{ username }}"
+  become: yes
+  become_user: root
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
+
+#- name: osx - Remove the newuser script
+#  file: path={{ newuser_script.stdout }} state=absent
+#  when: ansible_distribution == 'MacOSX'
+#  tags: setup, osx
+
+- name: osx - Prepend /usr/local/bin to $PATH in .profile
+  lineinfile:
+    dest=/Users/{{ username }}/.profile
+    state=present
+    regexp="^export\s+PATH=/usr/local/bin:\\$PATH"
+    insertafter=EOF
+    line="export
+    PATH=/usr/local/bin:$PATH"
+    create=yes
+  become: yes
+  become_user: root
+  when: ansible_distribution == 'MacOSX'
+  tags: setup, osx
