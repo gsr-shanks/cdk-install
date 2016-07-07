@@ -19,12 +19,9 @@
   when: skipped_repos is defined and enabled_repos|length > 0
 
 - name: yum_install | install rpms
-  yum: name={{ item }} state=latest disable_gpg_check=yes
+  yum: name={{ item }} state=present disable_gpg_check=yes
   with_items: "{{ rhel_pkgs }}"
   when: rhel_pkgs is defined and rhel_pkgs|length > 0
-
-- name: upgrade all packages to latest
-  yum: name=* state=latest disable_gpg_check=yes
 
 - name: install virtualization group
   yum: name="@^virtualization-host-environment" state=present disable_gpg_check=yes

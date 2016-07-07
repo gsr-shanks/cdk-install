@@ -16,7 +16,7 @@ rhn_server_hostname: subscription.rhn.stage.redhat.com
 
 rhn_server_insecure: false
 autosubscribe: true
-rhsm_baseurl: https://cdn.qa.redhat.com
+rhsm_baseurl: http://cdn.stage.redhat.com
 rhsm_repos:
     - rhel-7-server-rpms
     - rhel-7-server-optional-rpms
@@ -24,7 +24,9 @@ rhsm_repos:
 
 rhel_pkgs:
     - libvirt
-    - sclo-vagrant1
+    - libxml2-devel
+    - libvirt-devel
+    - sclo-vagrant1-vagrant-1.7.4-3.el7.noarch # vagrant 1.8.1 does not work with bundled plugins in CDK.
     - sclo-vagrant1-vagrant-libvirt
     - sclo-vagrant1-vagrant-libvirt-doc
     - sclo-vagrant1-vagrant-registration
@@ -52,3 +54,10 @@ enabled_repos:
 disabled_repos: []
 skipped_repos:
     - rhel-7-server-rt-beta-rpms
+
+
+# ~~~ Extra variables
+registration_skip: "{{ skip_registration|default('true') }}"
+username: "{{ user_name|default('cdk') }}"
+password: redhat
+box_name: "{{ vagrant_box_name|default('cdkv2') }}"

@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
 
-wget -A zip,ks,vagrant-libvirt.box -r --no-parent -l1 -nd --reject="index.html*" {{ cdk_location }}
-unzip *.zip
+OS=`uname`
+
+case "$OS" in
+    Linux)
+        wget -A zip,ks,vagrant-libvirt.box -r --no-parent -l1 -nd --reject="index.html*" {{ cdk_location }}
+        ;;
+    Darwin)
+        wget -A zip,ks,vagrant-virtualbox.box -r --no-parent -l1 -nd --reject="index.html*" {{ cdk_location }}
+        ;;
+esac
+
+if [ -f "cdk.zip" ]; then
+    unzip cdk.zip
+fi

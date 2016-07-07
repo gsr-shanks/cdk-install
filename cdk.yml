@@ -6,21 +6,26 @@
   tasks:
     - include: tasks/rhn_register.yml
       when: ansible_os_family == 'RedHat' and ansible_distribution_version >= '7.2' and rhn_method is defined
+      tags: setup, rhel
+
     - include: tasks/yum.yml
       when: ansible_distribution == 'RedHat' and ansible_distribution_version >= '7.2'
+      tags: setup, rhel
 
     - include: tasks/dnf.yml
       when: ansible_distribution == 'Fedora' and ansible_distribution_version >= '23'
+      tags: setup, fedora
 
     - include: tasks/prereq.yml
-
-    - include: tasks/cdk.yml
-      become: yes
-      become_user: cdk
+      tags: setup, rhel, fedora, osx
 
     - include: tasks/vagrant.yml
       become: yes
-      become_user: cdk
+      become_user: "{{ username }}"
       environment:
         SUB_USERNAME: "{{ rhn_username }}"
         SUB_PASSWORD: "{{ rhn_password }}"
+      tags: setup, rhel, fedora, osx
+
+    - include: tasks/clean_up.yml
+      tags: uninstall
